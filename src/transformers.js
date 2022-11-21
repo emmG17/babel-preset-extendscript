@@ -307,7 +307,7 @@ function(arg) {
 `;
 
 function createTransformPlugin(name, replace, code) {
-  return function({ types: t }) {
+  return function ({ types: t }) {
     const defineName = name;
     return {
       visitor: {
@@ -327,9 +327,7 @@ function createTransformPlugin(name, replace, code) {
         },
         MemberExpression: {
           enter(path, state) {
-            const memberName = `${path.node.object.name}.${
-              path.node.property.name
-            }`;
+            const memberName = `${path.node.object.name}.${path.node.property.name}`;
 
             if (memberName == replace) {
               state[name].matches += 1;
@@ -363,11 +361,11 @@ function createTransformPlugin(name, replace, code) {
 }
 
 function createTransformPluginMultiple(name, replacers, code) {
-  return function({ types: t }) {
+  return function ({ types: t }) {
     return {
       visitor: {
-        CallExpression: function(path, state) {
-          Object.keys(replacers).map(key => {
+        CallExpression: function (path, state) {
+          Object.keys(replacers).map((key) => {
             const replace = key;
             const token = replacers[key];
 
@@ -391,12 +389,11 @@ function createTransformPluginMultiple(name, replacers, code) {
               matches: 0,
               tokens: {},
             };
-            Object.keys(replacers).map(key => {
+            Object.keys(replacers).map((key) => {
               const replace = key;
               const token = replacers[key];
-              state[name].tokens[token] = path.scope.generateUidIdentifier(
-                replace
-              ).name;
+              state[name].tokens[token] =
+                path.scope.generateUidIdentifier(replace).name;
             });
           },
           exit(path, state) {
@@ -404,7 +401,7 @@ function createTransformPluginMultiple(name, replacers, code) {
 
             const topNodes = [];
             const tokens = {};
-            Object.keys(state[name].tokens).forEach(token => {
+            Object.keys(state[name].tokens).forEach((token) => {
               tokens[token] = t.identifier(state[name].tokens[token]);
             });
 
@@ -422,10 +419,10 @@ function createTransformPluginMultiple(name, replacers, code) {
 }
 
 function createTransformPluginNoWrap(replace, code) {
-  return function({ types: t }) {
+  return function ({ types: t }) {
     return {
       visitor: {
-        CallExpression: function(path, file) {
+        CallExpression: function (path, file) {
           if (
             path.get('callee').matchesPattern(replace) ||
             path.node.callee.name == replace
@@ -440,9 +437,7 @@ function createTransformPluginNoWrap(replace, code) {
         },
         MemberExpression: {
           exit(path, state) {
-            const memberName = `${path.node.object.name}.${
-              path.node.property.name
-            }`;
+            const memberName = `${path.node.object.name}.${path.node.property.name}`;
 
             if (memberName == replace) {
               path.replaceWith(t.identifier('$.writeln'));
@@ -498,8 +493,8 @@ function(array, callback) {
     throw new TypeError(callback + ' is not a function');
   }
   var t = Object(array), len = t.length >>> 0, k = 0, value;
-  if (arguments.length == 2) {
-    value = arguments[1];
+  if (arguments.length == 3) {
+    value = arguments[2];
   } else {
     while (k < len && !(k in t)) {
       k++;
@@ -537,15 +532,14 @@ function(array, callback) {
 
 function createMemberExpressionPolyfill(name, replace, code) {
   const replaceWith = `_${replace}`;
-  return function({ types: t }) {
+  return function ({ types: t }) {
     return {
       visitor: {
         Program: {
           enter(path, state) {
             state[name] = {};
-            state[name].name = path.scope.generateUidIdentifier(
-              replaceWith
-            ).name;
+            state[name].name =
+              path.scope.generateUidIdentifier(replaceWith).name;
             state[name].matches = 0;
           },
           exit(path, state) {

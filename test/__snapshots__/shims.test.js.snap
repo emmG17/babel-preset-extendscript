@@ -127,8 +127,8 @@ exports[`Array.prototype.reduce() 1`] = `
       k = 0,
       value;
 
-  if (arguments.length == 2) {
-    value = arguments[1];
+  if (arguments.length == 3) {
+    value = arguments[2];
   } else {
     while (k < len && !(k in t)) {
       k++;
